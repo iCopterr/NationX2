@@ -11,11 +11,40 @@ export interface ResourceAmount {
 }
 
 // ─── Knowledge ──────────────────────────────────────────────
-export type KnowledgeType = 'technology' | 'military' | 'engineering' | 'science' | 'economics' | 'medicine';
+// Core types (Phase 2). Add new types here to expand the system.
+export type KnowledgeType =
+  | 'technology'
+  | 'military'
+  | 'engineering'
+  | 'science'
+  // Expansion slots — add more types below:
+  | 'economics'
+  | 'medicine';
 
 export interface KnowledgeRequirement {
   type: KnowledgeType;
   minLevel: number;
+}
+
+/** Snapshot of one knowledge domain for a country */
+export interface KnowledgeLevel {
+  type: KnowledgeType;
+  level: number;
+  xp: number;
+  xpToNextLevel: number;
+  maxLevel: number;
+  progressPct: number; // 0–100
+}
+
+/** Result returned by addKnowledge */
+export interface AddKnowledgeResult {
+  type: KnowledgeType;
+  amountAdded: number;
+  levelBefore: number;
+  levelAfter: number;
+  levelsGained: number;
+  xpNow: number;
+  xpToNextLevel: number;
 }
 
 // ─── Policy ─────────────────────────────────────────────────

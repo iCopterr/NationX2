@@ -41,7 +41,7 @@ export const AuthService = {
 
     // Initialize knowledge (all at 0)
     for (const type of KNOWLEDGE_TYPES) {
-      await KnowledgeModel.upsert(country.id, type);
+      await KnowledgeModel.ensureExists(country.id, type);
     }
 
     // Initialize default allocation

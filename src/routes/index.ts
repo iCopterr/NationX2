@@ -33,8 +33,12 @@ router.get('/resources',              authenticate, ResourceController.getResour
 router.post('/resources/explore',     authenticate, resourceValidation.explore, ResourceController.exploreResource);
 
 // ── Knowledge ────────────────────────────────────────────────
-router.get('/knowledge',              authenticate, KnowledgeController.getKnowledge);
-router.post('/knowledge/research',    authenticate, knowledgeValidation.research, KnowledgeController.research);
+router.get('/knowledge',                    authenticate, KnowledgeController.getKnowledge);
+router.get('/knowledge/types',              KnowledgeController.getTypes);           // public — no auth
+router.get('/knowledge/:type',              authenticate, KnowledgeController.getKnowledgeByType);
+router.post('/knowledge/add',               authenticate, knowledgeValidation.add,      KnowledgeController.addKnowledge);
+router.post('/knowledge/research',          authenticate, knowledgeValidation.research, KnowledgeController.research);
+router.post('/knowledge/check',             authenticate, knowledgeValidation.check,    KnowledgeController.checkRequirements);
 
 // ── Policies ─────────────────────────────────────────────────
 router.get('/policies',               authenticate, PolicyController.getPolicies);

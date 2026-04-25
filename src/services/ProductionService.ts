@@ -37,10 +37,12 @@ export const ProductionService = {
     if (!recipe) throw new Error('Recipe not found');
 
     // 1. Knowledge check
-    const { met, missing } = await KnowledgeService.checkRequirements(countryId, recipe.knowledge_req);
-    if (!met) {
+    const check = await KnowledgeService.checkKnowledgeRequirement(countryId, recipe.knowledge_req);
+    if (!check.met) {
       throw new Error(
-        `Knowledge requirements not met: ${missing.map((m) => `${m.type} (need ${m.required}, have ${m.current})`).join(', ')}`
+        `Knowledge requirements not met: ${check.missing
+          .map((m) => `${m.label} (need ${m.required}, have ${m.current})`)
+          .join(', ')}`
       );
     }
 
