@@ -54,10 +54,14 @@ router.post('/policies/:id/enact',    authenticate, PolicyController.enactPolicy
 router.post('/policies/:id/repeal',   authenticate, PolicyController.repealPolicy);
 
 // ── Production ───────────────────────────────────────────────
-router.get('/production/recipes',     authenticate, ProductionController.getRecipes);
-router.get('/production/orders',      authenticate, ProductionController.getOrders);
-router.get('/production/orders/active', authenticate, ProductionController.getActiveOrders);
-router.post('/production/craft',      authenticate, productionValidation.craft, ProductionController.craftItem);
+router.get('/production/recipes',           authenticate, ProductionController.getRecipes);        // ?category=&search=
+router.get('/production/recipes/categories', ProductionController.getCategories);                  // public
+router.get('/production/recipes/:id',       authenticate, ProductionController.getRecipeById);
+router.get('/production/orders',            authenticate, ProductionController.getOrders);
+router.get('/production/orders/active',     authenticate, ProductionController.getActiveOrders);
+router.post('/production/check',            authenticate, productionValidation.check,  ProductionController.checkRequirements);
+router.post('/production/craft',            authenticate, productionValidation.craft,  ProductionController.craftItem);
+router.delete('/production/orders/:orderId', authenticate, ProductionController.cancelOrder);
 
 // ── Market ───────────────────────────────────────────────────
 router.get('/market',                 authenticate, MarketController.getListings);

@@ -121,7 +121,50 @@ export type EventSeverity = 'low' | 'medium' | 'high' | 'catastrophic';
 export type EventStatus = 'active' | 'resolved' | 'expired';
 
 // ─── Production ─────────────────────────────────────────────
-export type ProductionStatus = 'idle' | 'producing' | 'paused' | 'completed';
+export type ProductionStatus = 'idle' | 'producing' | 'paused' | 'completed' | 'cancelled';
+
+export type ItemCategory =
+  | 'materials'       // raw/refined resources
+  | 'consumables'     // food, medicine
+  | 'technology'      // electronics, components
+  | 'military'        // weapons, vehicles
+  | 'infrastructure'  // buildings, energy systems
+  | 'trade_goods';    // export commodities
+
+/** Full cost summary for crafting — shown to player before committing */
+export interface CraftCost {
+  resourceCosts: ResourceAmount[];   // scaled by quantity
+  moneyCost: number;                 // labor + overhead
+  productionTimeSecs: number;        // total time for all units
+}
+
+/** Pre-flight check result before a craft attempt */
+export interface CraftRequirementsCheck {
+  canCraft: boolean;
+  knowledgeMet: boolean;
+  resourcesMet: boolean;
+  moneyMet: boolean;
+  knowledgeMissing: Array<{ type: string; required: number; current: number; label: string }>;
+  resourcesMissing: Array<{ type: string; required: number; current: number }>;
+  moneyMissing: number;
+  cost: CraftCost;
+}
+
+/** Full result returned by craftItem() */
+export interface CraftResult {
+  orderId: string;
+  recipeId: string;
+  recipeName: string;
+  category: ItemCategory;
+  quantity: number;
+  cost: CraftCost;
+  status: ProductionStatus;
+  startsAt: Date;
+  completesAt: Date;
+  outputPreview: ResourceAmount[];  // what will be delivered on completion
+  isInstant: boolean;               // true if production_time === 0
+  deliveredOutputs?: ResourceAmount[];  // set only when isInstant === true
+}
 
 // ─── Economy ────────────────────────────────────────────────
 export interface EconomyStats {

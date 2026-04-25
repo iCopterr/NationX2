@@ -108,12 +108,14 @@ export async function migrate(): Promise<void> {
       id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name              VARCHAR(128) UNIQUE NOT NULL,
       description       TEXT,
-      category          VARCHAR(64),
+      category          VARCHAR(64) NOT NULL DEFAULT 'materials',
       input_resources   JSONB NOT NULL DEFAULT '[]',
       output_resources  JSONB NOT NULL DEFAULT '[]',
       knowledge_req     JSONB NOT NULL DEFAULT '[]',
       production_time   INTEGER DEFAULT 60,
       base_value        NUMERIC(20,2) DEFAULT 100,
+      labor_cost_pct    NUMERIC(5,4) DEFAULT 0.10,
+      max_quantity      INTEGER DEFAULT 0,
       is_enabled        BOOLEAN DEFAULT TRUE,
       created_at        TIMESTAMPTZ DEFAULT NOW()
     );
@@ -125,10 +127,12 @@ export async function migrate(): Promise<void> {
       country_id   UUID NOT NULL REFERENCES countries(id) ON DELETE CASCADE,
       recipe_id    UUID NOT NULL REFERENCES item_recipes(id),
       quantity     INTEGER DEFAULT 1,
-      status       VARCHAR(32) DEFAULT 'idle',
-      started_at   TIMESTAMPTZ,
+      status       VARCHAR(32) DEFAULT 'producing',
+      money_cost   NUMERIC(20,2) DEFAULT 0,
+      started_at   TIMESTAMPTZ DEFAULT NOW(),
       completes_at TIMESTAMPTZ,
       completed_at TIMESTAMPTZ,
+      cancelled_at TIMESTAMPTZ,
       created_at   TIMESTAMPTZ DEFAULT NOW()
     );
   `);
