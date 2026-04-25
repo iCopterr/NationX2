@@ -3,12 +3,69 @@
 // ============================================================
 
 // ─── Resource ───────────────────────────────────────────────
-export type ResourceType = 'metal' | 'energy' | 'food' | 'oil' | 'water' | 'rare_earth';
+// Core types. Add new resource types here to expand the system.
+export type ResourceType =
+  | 'metal'
+  | 'energy'
+  | 'food'
+  // Expansion slots:
+  | 'oil'
+  | 'water'
+  | 'rare_earth';
 
 export interface ResourceAmount {
   type: ResourceType;
   amount: number;
 }
+
+/** Per-type static config — drives production/consumption/exploration */
+export interface ResourceConfig {
+  label: string;
+  description: string;
+  /** Default storage capacity */
+  defaultCapacity: number;
+  /** Base units produced per tick (before modifiers) */
+  baseProduction: number;
+  /** Base units consumed per tick (before modifiers) */
+  baseConsumption: number;
+  /** Which knowledge type boosts this resource's production */
+  knowledgeBoost?: string;
+  /** Exploration base yield as fraction of investment money */
+  exploreBaseYieldPct: number;
+  /** Happiness penalty per tick when in deficit */
+  deficitHappinessPenalty: number;
+}
+
+/** Returned by produceResource / consumeResource / exploreResource */
+export interface ProduceResult {
+  type: ResourceType;
+  produced: number;
+  amountBefore: number;
+  amountAfter: number;
+  infrastructureBonus: number;
+}
+
+export interface ConsumeResult {
+  type: ResourceType;
+  requested: number;
+  consumed: number;          // actually deducted (may be < requested if in deficit)
+  deficit: number;           // shortage amount
+  inDeficit: boolean;
+  happinessPenalty: number;
+}
+
+export type ExploreOutcome = 'jackpot' | 'success' | 'partial' | 'failure' | 'dry';
+
+export interface ExploreResult {
+  type: ResourceType;
+  outcome: ExploreOutcome;
+  investment: number;
+  discovered: number;
+  amountAfter: number;
+  riskRoll: number;          // 0-100, for transparency
+  message: string;
+}
+
 
 // ─── Knowledge ──────────────────────────────────────────────
 // Core types (Phase 2). Add new types here to expand the system.

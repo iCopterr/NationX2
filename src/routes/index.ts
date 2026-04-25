@@ -29,8 +29,12 @@ router.get('/countries/me/history', authenticate, CountryController.getEconomyHi
 router.get('/countries/:id',      CountryController.getById);
 
 // ── Resources ────────────────────────────────────────────────
-router.get('/resources',              authenticate, ResourceController.getResources);
-router.post('/resources/explore',     authenticate, resourceValidation.explore, ResourceController.exploreResource);
+router.get('/resources',                authenticate, ResourceController.getResources);
+router.get('/resources/types',          ResourceController.getTypes);                // public
+router.get('/resources/logs',           authenticate, ResourceController.getLogs);
+router.post('/resources/produce',       authenticate, resourceValidation.produce,  ResourceController.produceResource);
+router.post('/resources/consume',       authenticate, resourceValidation.consume,  ResourceController.consumeResource);
+router.post('/resources/explore',       authenticate, resourceValidation.explore,  ResourceController.exploreResource);
 
 // ── Knowledge ────────────────────────────────────────────────
 router.get('/knowledge',                    authenticate, KnowledgeController.getKnowledge);

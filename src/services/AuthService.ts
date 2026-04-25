@@ -6,6 +6,7 @@ import { config } from '../config';
 import { UserModel, CreateUserDto } from '../models/User';
 import { CountryModel } from '../models/Country';
 import { ResourceModel } from '../models/Resource';
+import { ResourceService } from './ResourceService';
 import { KnowledgeModel } from '../models/Knowledge';
 import { PolicyModel } from '../models/Policy';
 import { JwtPayload } from '../types';
@@ -32,11 +33,11 @@ export const AuthService = {
       flagEmoji: dto.flagEmoji,
     });
 
-    // Initialize starter resources
+    // Initialize starter resources using the Resource System
     for (const type of RESOURCE_TYPES) {
       const starterAmount = type === 'food' ? 500 : type === 'metal' ? 200 : 100;
-      await ResourceModel.upsert(country.id, type, { capacity: 100000 });
-      await ResourceModel.adjust(country.id, type, starterAmount);
+      await ResourceModel.ensureExists(country.id, type);
+      await ResourceService.produceResource(country.id, type, starterAmount);
     }
 
     // Initialize knowledge (all at 0)

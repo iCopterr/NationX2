@@ -31,7 +31,7 @@ export const MarketService = {
       // Deduct from inventory (escrow)
       const has = await ResourceModel.hasSufficient(countryId, dto.resourceType, dto.quantity);
       if (!has) throw new Error(`Insufficient ${dto.resourceType}`);
-      await ResourceModel.adjust(countryId, dto.resourceType, -dto.quantity);
+      await ResourceModel.adjust(countryId, dto.resourceType, -dto.quantity, 'trade');
     }
 
     return MarketModel.createListing({ ...dto, sellerId: countryId });
@@ -61,8 +61,8 @@ export const MarketService = {
 
     // 3. Transfer resource to buyer
     if (listing.resource_type) {
-      await ResourceModel.upsert(buyerCountryId, listing.resource_type as ResourceType);
-      await ResourceModel.adjust(buyerCountryId, listing.resource_type as ResourceType, Number(listing.quantity));
+      await ResourceModel.ensureExists(buyerCountryId, listing.resource_type as ResourceType);
+      await ResourceModel.adjust(buyerCountryId, listing.resource_type as ResourceType, Number(listing.quantity), 'trade');
     }
 
     // 4. Mark listing sold
@@ -92,8 +92,8 @@ export const MarketService = {
 
     // Refund resource
     if (listing.resource_type) {
-      await ResourceModel.upsert(countryId, listing.resource_type as ResourceType);
-      await ResourceModel.adjust(countryId, listing.resource_type as ResourceType, Number(listing.quantity));
+      await ResourceModel.ensureExists(countryId, listing.resource_type as ResourceType);
+      await ResourceModel.adjust(countryId, listing.resource_type as ResourceType, Number(listing.quantity), 'trade');
     }
 
     return listing;

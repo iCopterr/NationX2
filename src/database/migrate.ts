@@ -215,6 +215,21 @@ export async function migrate(): Promise<void> {
     INSERT INTO tick_counter(id, value) VALUES(1, 0) ON CONFLICT DO NOTHING;
   `);
 
+  // ── Resource Logs ─────────────────────────────────────────────
+  await query(`
+    CREATE TABLE IF NOT EXISTS resource_logs (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      country_id    UUID NOT NULL REFERENCES countries(id) ON DELETE CASCADE,
+      type          VARCHAR(32) NOT NULL,
+      action        VARCHAR(32) NOT NULL,
+      delta         NUMERIC(20,4) NOT NULL,
+      amount_before NUMERIC(20,4) NOT NULL,
+      amount_after  NUMERIC(20,4) NOT NULL,
+      source        VARCHAR(64) DEFAULT 'system',
+      logged_at     TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
   // ── Indexes ─────────────────────────────────────────────────
   await query(`CREATE INDEX IF NOT EXISTS idx_resources_country  ON resources(country_id);`);
   await query(`CREATE INDEX IF NOT EXISTS idx_knowledge_country  ON knowledge(country_id);`);
@@ -223,6 +238,7 @@ export async function migrate(): Promise<void> {
   await query(`CREATE INDEX IF NOT EXISTS idx_listings_status    ON market_listings(status);`);
   await query(`CREATE INDEX IF NOT EXISTS idx_economy_country    ON economy_ticks(country_id);`);
   await query(`CREATE INDEX IF NOT EXISTS idx_events_status      ON global_events(status);`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_resource_logs_country ON resource_logs(country_id, type);`);
 
   console.log('[DB] ✅ All migrations complete.');
 }

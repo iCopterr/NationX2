@@ -24,9 +24,8 @@ import { config } from '../config';
 /** How much of GDP is converted to income per tick */
 const GDP_INCOME_RATIO = 0.001;
 
-/** Base happiness recovery/decay rate */
+/** Base happiness recovery rate per tick */
 const HAPPINESS_RECOVERY = 0.1;
-const HAPPINESS_DECAY_PER_DEFICIT = 2.0;
 
 export const EconomyLoopService = {
   /** Increment tick counter and return new tick number */
@@ -68,13 +67,10 @@ export const EconomyLoopService = {
 
     // ── Step 4: Resource production & consumption ───────────────
     await ResourceService.produceTick(countryId, resourceMults);
-    const { deficits } = await ResourceService.consumeTick(countryId);
+    const { deficits, totalPenalty } = await ResourceService.consumeTick(countryId);
 
-    // Penalties for resource deficits
-    for (const deficit of deficits) {
-      const penalty = deficit === 'food' ? 3.0 : deficit === 'energy' ? 2.0 : 1.0;
-      happinessDelta -= HAPPINESS_DECAY_PER_DEFICIT * penalty;
-    }
+    // Apply deficit happiness penalty from resource service (already config-driven)
+    happinessDelta -= totalPenalty;
 
     // ── Step 5: Passive knowledge XP ────────────────────────────
     if (allocation) {
